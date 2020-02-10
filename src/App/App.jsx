@@ -1,14 +1,26 @@
 import React, { Component } from "react";
 import "./App.css";
-import { Navbar, ListGroup, Alert } from "react-bootstrap";
-import { FaHeadphones } from "react-icons/fa";
+import {
+  Navbar,
+  ListGroup,
+  Alert,
+  Button,
+  Row,
+  Col,
+  Container
+} from "react-bootstrap";
+import { FaHeadphones, FaBackward, FaCompactDisc } from "react-icons/fa";
+import { TiGroupOutline } from "react-icons/ti";
 import Axios from "axios";
+import styled from "styled-components";
+import CoverContra from "./images/Cover_contra.jpg";
 
 class App extends Component {
   constructor() {
     super();
     this.state = {
       artist: "",
+      album: "",
       title: "",
       lyrics: "",
       songs: [],
@@ -20,6 +32,7 @@ class App extends Component {
   componentDidMount() {
     this.setState({
       artist: "Vampire Weekend",
+      album: "Contra",
       songs: [
         { id: 1, title: "Horchata" },
         { id: 2, title: "White Sky" },
@@ -37,7 +50,7 @@ class App extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { title } = this.state;
-    if (title !== prevState.title) {
+    if (title.length > 1 && title !== prevState.title) {
       this.getLyrics();
     }
   }
@@ -60,12 +73,36 @@ class App extends Component {
     this.setState({ title });
   }
 
+  clearSongState() {
+    this.setState({
+      title: "",
+      lyrics: ""
+    });
+  }
+
+  handleClickBack() {
+    this.clearSongState();
+  }
+
   clearError() {
     this.setState({ error: false, errorMessage: "" });
   }
 
   render() {
-    const { artist, lyrics, songs, error, errorMessage } = this.state;
+    const {
+      artist,
+      album,
+      title,
+      lyrics,
+      songs,
+      error,
+      errorMessage
+    } = this.state;
+
+    const AlbumCoverImage = styled.img`
+      max-width: 100%;
+      padding: 1rem;
+    `;
 
     return (
       <div>
@@ -78,32 +115,70 @@ class App extends Component {
           </Navbar.Text>
         </Navbar>
 
-        {error && (
-          <Alert
-            variant="primary"
-            onClose={() => this.clearError()}
-            dismissible
-            className="my-3"
-          >
-            {errorMessage}
-          </Alert>
-        )}
+        <Container>
+          <h1 className="sr-only">Lyrical</h1>
 
-        <ListGroup className="my-3">
-          {songs.map(song => (
-            <ListGroup.Item
-              key={song.id}
-              action
-              onClick={() => this.handleClickTitle(song.title)}
+          {error && (
+            <Alert
+              variant="primary"
+              onClose={() => this.clearError()}
+              dismissible
+              className="my-3"
             >
-              {song.title}
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
+              {errorMessage}
+            </Alert>
+          )}
 
-        <div>
-          <pre>{lyrics}</pre>
-        </div>
+          <div className="m-1 m-md-3">
+            <Row>
+              <Col>
+                <AlbumCoverImage src={CoverContra} />
+              </Col>
+              <Col>
+                <Row className="text-uppercase my-3 h-100 d-flex flex-column">
+                  <Col className="d-flex flex-column justify-content-center my-3 text-right">
+                    <p>
+                      <FaCompactDisc /> {album}
+                    </p>
+                    <p>
+                      <TiGroupOutline /> {artist}
+                    </p>
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+
+            {!lyrics && (
+              <ListGroup className="">
+                {songs.map(song => (
+                  <ListGroup.Item
+                    key={song.id}
+                    action
+                    onClick={() => this.handleClickTitle(song.title)}
+                  >
+                    {song.title}
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+            )}
+          </div>
+
+          {lyrics && (
+            <div className="m-3">
+              <Button
+                variant="primary"
+                className="my-1"
+                onClick={() => this.handleClickBack()}
+              >
+                <FaBackward /> Back
+              </Button>
+
+              <h2 className="text-uppercase font-weight-bold">{title}</h2>
+
+              <pre className="my-3 text-secondary">{lyrics}</pre>
+            </div>
+          )}
+        </Container>
       </div>
     );
   }
