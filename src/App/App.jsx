@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import "./App.css";
-import { Navbar, ListGroup } from "react-bootstrap";
+import { Navbar, ListGroup, Alert } from "react-bootstrap";
 import { FaHeadphones } from "react-icons/fa";
 import Axios from "axios";
 
@@ -11,7 +11,9 @@ class App extends Component {
       artist: "",
       title: "",
       lyrics: "",
-      songs: []
+      songs: [],
+      error: false,
+      errorMessage: ""
     };
   }
 
@@ -44,7 +46,9 @@ class App extends Component {
     const { artist, title } = this.state;
     Axios.get(`https://api.lyrics.ovh/v1/${artist}/${title}`)
       .then(response => this.setState({ lyrics: response.data.lyrics }))
-      .catch(error => console.log(error));
+      .catch(error => {
+        this.setState({ error: true, errorMessage: error.response.data.error });
+      });
   }
 
   titleIsValid = title => {
@@ -56,8 +60,12 @@ class App extends Component {
     this.setState({ title });
   }
 
+  clearError() {
+    this.setState({ error: false, errorMessage: "" });
+  }
+
   render() {
-    const { artist, lyrics, songs } = this.state;
+    const { artist, lyrics, songs, error, errorMessage } = this.state;
 
     return (
       <div>
@@ -70,7 +78,18 @@ class App extends Component {
           </Navbar.Text>
         </Navbar>
 
-        <ListGroup>
+        {error && (
+          <Alert
+            variant="primary"
+            onClose={() => this.clearError()}
+            dismissible
+            className="my-3"
+          >
+            {errorMessage}
+          </Alert>
+        )}
+
+        <ListGroup className="my-3">
           {songs.map(song => (
             <ListGroup.Item
               key={song.id}
