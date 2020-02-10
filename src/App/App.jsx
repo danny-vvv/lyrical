@@ -2,12 +2,15 @@ import React, { Component } from "react";
 import "./App.css";
 import { Navbar, ListGroup } from "react-bootstrap";
 import { FaHeadphones } from "react-icons/fa";
+import Axios from "axios";
 
 class App extends Component {
   constructor() {
     super();
     this.state = {
       artist: "",
+      title: "",
+      lyrics: "",
       songs: []
     };
   }
@@ -16,22 +19,45 @@ class App extends Component {
     this.setState({
       artist: "Vampire Weekend",
       songs: [
-        { id: 1, name: "Horchata" },
-        { id: 2, name: "White Sky" },
-        { id: 3, name: "Holiday" },
-        { id: 4, name: "California English" },
-        { id: 5, name: "Taxi Cab" },
-        { id: 6, name: "Run" },
-        { id: 7, name: "Cousins" },
-        { id: 8, name: "Giving Up The Gun" },
-        { id: 9, name: "Diplomat's son" },
-        { id: 10, name: "I Think Ur a Contra" }
+        { id: 1, title: "Horchata" },
+        { id: 2, title: "White Sky" },
+        { id: 3, title: "Holiday" },
+        { id: 4, title: "California English" },
+        { id: 5, title: "Taxi Cab" },
+        { id: 6, title: "Run" },
+        { id: 7, title: "Cousins" },
+        { id: 8, title: "Giving Up The Gun" },
+        { id: 9, title: "Diplomat's son" },
+        { id: 10, title: "I Think Ur a Contra" }
       ]
     });
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    const { title } = this.state;
+    if (title !== prevState.title) {
+      this.getLyrics();
+    }
+  }
+
+  getLyrics() {
+    const { artist, title } = this.state;
+    Axios.get(`https://api.lyrics.ovh/v1/${artist}/${title}`)
+      .then(response => this.setState({ lyrics: response.data.lyrics }))
+      .catch(error => console.log(error));
+  }
+
+  titleIsValid = title => {
+    return typeof songtitle === "string" && title.length > 0;
+  };
+
+  handleClickTitle(title = "") {
+    if (!this.titleIsValid) return;
+    this.setState({ title });
+  }
+
   render() {
-    const { artist, songs } = this.state;
+    const { artist, lyrics, songs } = this.state;
 
     return (
       <div>
@@ -46,11 +72,19 @@ class App extends Component {
 
         <ListGroup>
           {songs.map(song => (
-            <ListGroup.Item action key={song.id}>
-              {song.name}
+            <ListGroup.Item
+              key={song.id}
+              action
+              onClick={() => this.handleClickTitle(song.title)}
+            >
+              {song.title}
             </ListGroup.Item>
           ))}
         </ListGroup>
+
+        <div>
+          <pre>{lyrics}</pre>
+        </div>
       </div>
     );
   }
