@@ -21,8 +21,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "./node_modules/.bin/eslint . --ext .js,.jsx --ignore-pattern node_modules/",
-    "lint-fix": "./node_modules/.bin/eslint . --ext .js,.jsx --ignore-pattern node_modules/ --fix"
+    "lint": "./node_modules/.bin/eslint . --ext .js,.jsx --ignore-path .gitignore --ignore-pattern node_modules/",
+    "lint-fix": "./node_modules/.bin/eslint . --ext .js,.jsx --ignore-path .gitignore --ignore-pattern node_modules/ --fix"
   },
   "eslintConfig": {
     "extends": "react-app"
